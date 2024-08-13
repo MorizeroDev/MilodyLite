@@ -1,0 +1,55 @@
+name: MacOS
+
+on:
+  workflow_call:
+
+jobs:
+  build:
+    env:
+      MILODY_TARGET_OS: "macos"
+      MILODY_TARGET_ARCH: "arm64"
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: "recursive"
+
+      # - name: Install Swift
+      #   uses: swift-actions/setup-swift@v1
+
+      - name: Xcode Select Version
+        uses: mobiledevops/xcode-select-version-action@v1
+        with:
+          xcode-select-version: 15.4
+
+      - name: Setup Meson
+        run: brew install meson
+
+      - name: Setup Ninja
+        run: brew install ninja
+
+      - name: Setup NASM
+        uses: ilammy/setup-nasm@v1
+
+      - name: Run CMake configuration for Game Library
+        run: |
+          cmake -S . -B build_game \
+          -GXcode \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DMILODY_ENABLE_CLI=OFF \
+          -DMILODY_ENABLE_TESTS=OFF \
+          -DMILODY_BUILD_SHARED_LIBS=ON \
+          -DCMAKE_INSTALL_PREFIX=./milody-game
+
+      - name: Build Game Library
+        run: cmake --build build_game --target install
+
+      - name: Package Game Library
+        run: tar -czvf milody-game-${{ env.MILODY_TARGET_OS }}-${{ env.MILODY_TARGET_ARCH }}.tar.gz milody-game
+
+      - name: Upload artifact Game
+        uses: actions/upload-artifact@v4
+        with:
+          name: milody-game-${{ env.MILODY_TARGET_OS }}-${{ env.MILODY_TARGET_ARCH }}
+          path: milody-game-${{ env.MILODY_TARGET_OS }}-${{ env.MILODY_TARGET_ARCH }}.tar.gz
+          retention-days: 30

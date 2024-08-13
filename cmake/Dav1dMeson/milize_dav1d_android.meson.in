@@ -1,0 +1,11 @@
+[binaries]
+c = '@CMAKE_ANDROID_NDK@/toolchains/llvm/prebuilt/@LOWER_HOST_SYSTEM_NAME@-x86_64/bin/@MILODY_TARGET_ARCH@-linux-android@ANDROID_SDK_VERSION@-clang@NDK_SCRIPT_SUFFIX@'
+cpp = '@CMAKE_ANDROID_NDK@/toolchains/llvm/prebuilt/@LOWER_HOST_SYSTEM_NAME@-x86_64/bin/@MILODY_TARGET_ARCH@-linux-android@ANDROID_SDK_VERSION@-clang++@NDK_SCRIPT_SUFFIX@'
+ar = '@CMAKE_ANDROID_NDK@/toolchains/llvm/prebuilt/@LOWER_HOST_SYSTEM_NAME@-x86_64/bin/llvm-ar@NDK_SCRIPT_SUFFIX_EXE@'
+strip = '@CMAKE_ANDROID_NDK@/toolchains/llvm/prebuilt/@LOWER_HOST_SYSTEM_NAME@-x86_64/bin/llvm-strip@NDK_SCRIPT_SUFFIX_EXE@'
+
+[host_machine]
+system = 'android'
+cpu_family = '@MILODY_TARGET_ARCH@'
+cpu = '@MILODY_TARGET_ARCH@'
+endian = 'little'

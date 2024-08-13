@@ -1,0 +1,5 @@
+[binaries]
+c = '@CMAKE_C_COMPILER@'
+cpp = '@CMAKE_CXX_COMPILER@'
+strip = '@CMAKE_STRIP@'
+ar = '@CMAKE_CXX_COMPILER_AR@'

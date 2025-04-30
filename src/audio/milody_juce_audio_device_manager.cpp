@@ -24,11 +24,12 @@ milody::audio::JuceAudioDeviceManager::~JuceAudioDeviceManager() {
 }
 
 void milody::audio::JuceAudioDeviceManager::initialize() {
-    auto message = audioDeviceManager.initialise(0, 2, nullptr, true, {}, nullptr);
+    auto message = audioDeviceManager.initialise(0, 2, nullptr, true, {}, &_deviceSetup);
     if (message.length() != 0) {
         MILODYLOG_ERROR(message.toRawUTF8());
         throw std::runtime_error("fail to initialize JuceAudioDeviceManager");
     }
+    audioDeviceManager.getAudioDeviceSetup(_deviceSetup);
     MILODYLOG_DEBUG("JuceAudioDeviceManager initialized");
 }
 
@@ -55,7 +56,11 @@ std::vector<milody::audio::AudioIODeviceTypeInfo> milody::audio::JuceAudioDevice
     return ret;
 }
 
-milody::audio::AudioIODeviceInfo milody::audio::JuceAudioDeviceManager::GetCurrentAudioDevice() {
+milody::audio::AudioIODeviceInfo milody::audio::JuceAudioDeviceManager::GetCurrentAudioDeviceInfo() {
+    return AudioIODeviceInfo(audioDeviceManager.getCurrentAudioDevice());
+}
+
+juce::AudioIODevice* milody::audio::JuceAudioDeviceManager::GetCurrentAudioDevice() {
     return audioDeviceManager.getCurrentAudioDevice();
 }
 
@@ -74,4 +79,24 @@ Result<void, std::string> milody::audio::JuceAudioDeviceManager::SetCurrentOutpu
         return Err(s);
     }
     return Ok();
+}
+
+Result<void, std::string> milody::audio::JuceAudioDeviceManager::SetCurrentBufferSize(int bufferSize) {
+    audioDeviceManager.getAudioDeviceSetup(_deviceSetup);
+    _deviceSetup.bufferSize = bufferSize;
+    auto message = audioDeviceManager.setAudioDeviceSetup(_deviceSetup, true);
+
+    if (message.length() != 0) {
+        auto s = std::string(message.toRawUTF8());
+        MILODYLOG_ERROR(s);
+        return Err(s);
+    }
+    return Ok();
+}
+
+void milody::audio::JuceAudioDeviceManager::EnableDaemonCallback() {
+    if (daemonCallback == nullptr) {
+        daemonCallback = std::make_unique<JuceDaemonIODeviceCallback>();
+        audioDeviceManager.addAudioCallback(daemonCallback.get());
+    }
 }

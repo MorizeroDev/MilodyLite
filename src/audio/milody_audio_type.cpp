@@ -37,4 +37,7 @@ milody::audio::AudioIODeviceInfo::AudioIODeviceInfo(juce::AudioIODevice* const p
     activeInputChannels = p->getActiveInputChannels();
     outputLatencyInSamples = p->getOutputLatencyInSamples();
     inputLatencyInSamples = p->getInputLatencyInSamples();
+
+    lastError = p->getLastError().toRawUTF8();
+    xRunCount = p->getXRunCount();
 }

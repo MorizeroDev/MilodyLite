@@ -1,4 +1,4 @@
-#include "Milody/audio/milody_juce_sound_player.h"
+#include <Milody/audio/milody_juce_sound_player.h>
 #include <Milody/audio/milody_juce_audio_device_manager.h>
 #include <Milody/game/milody_game_interface.h>
 #include <Milody/game/milody_game_retcode.h>

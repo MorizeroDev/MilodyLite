@@ -49,7 +49,7 @@ private:
 using UnityLogSink_mt = UnityLogSink<std::mutex>;
 
 // 管理sink和logger，支持控制台，文件，unity
-class MILODY_API MilodyLogger {
+class MILODY_EDITOR_API MilodyLogger {
 public:
     static MilodyLogger& getInstance();
 

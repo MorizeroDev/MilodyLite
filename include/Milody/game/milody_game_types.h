@@ -14,16 +14,17 @@
 
 namespace milody {
 
+namespace game::model {
+class BytesWrapper;
+} // namespace game::model
+
 namespace audio {
 namespace format {
-struct MuaPCM;
 }
 
 class JuceAudioBuffer;
 
 class JuceAudioSourcePlayer;
-
-class JuceMUASourcePlayer;
 
 class JuceAudioFormatReader;
 

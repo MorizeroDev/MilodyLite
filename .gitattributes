@@ -1,0 +1,27 @@
+*.sh text eol=lf
+gradlew text eol=lf
+*.txt text eol=lf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+CMakeLists.txt text eol=lf
+*.cmake text eol=lf
+
+*.json text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.properties text eol=lf
+*.toml text eol=lf
+
+*.cpp text eol=lf
+*.c text eol=lf
+*.h text eol=lf
+*.hpp text eol=lf
+
+*.kts text eol=lf
+
+*.m text eol=lf
+*.mm text eol=lf
+*.swift text eol=lf
+
+*.asm text eol=lf

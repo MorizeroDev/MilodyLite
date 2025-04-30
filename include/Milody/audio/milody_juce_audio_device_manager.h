@@ -6,6 +6,7 @@
 #include "milody_audio_types.h"
 #include "milody_juce_audio_buffer.h"
 #include "milody_juce_audio_source_player.h"
+#include "milody_juce_daemon_iodevice_callback.h"
 #include <Milody/common/milody_result.h>
 #include <Milody/util/milody_serializerable.h>
 #include <juce_audio_devices/juce_audio_devices.h>
@@ -25,11 +26,15 @@ public:
 
     std::vector<AudioIODeviceTypeInfo> GetAvailableDeviceTypes();
 
-    AudioIODeviceInfo GetCurrentAudioDevice();
+    AudioIODeviceInfo GetCurrentAudioDeviceInfo();
+
+    juce::AudioIODevice* GetCurrentAudioDevice();
 
     void SetCurrentOutputDeviceType(std::string device);
 
     [[nodiscard]] Result<void, std::string> SetCurrentOutputDeviceName(std::string deviceName);
+
+    [[nodiscard]] Result<void, std::string> SetCurrentBufferSize(int bufferSize);
 
     void setChangeListenerCallback(MilodyJuceAudioDeviceManagerChangeListenerCallback callback, void* ctx);
 
@@ -43,6 +48,20 @@ public:
         audioDeviceManager.removeAudioCallback(callback);
     };
 
+    void EnableDaemonCallback();
+
+    [[nodiscard]] int64_t DaemonCallbackGetCount() {
+        return daemonCallback->getCount();
+    };
+
+    [[nodiscard]] int64_t DaemonCallbackIsStopped() {
+        return daemonCallback->isStopped();
+    };
+
+    [[nodiscard]] std::string DaemonCallbackGetErrorMessage() {
+        return daemonCallback->getErrorMessage();
+    }
+
 private:
     juce::AudioDeviceManager audioDeviceManager;
 
@@ -50,6 +69,8 @@ private:
 
     MilodyJuceAudioDeviceManagerChangeListenerCallback managedChangeListenerCallback = nullptr;
     void* managedChangeListenerCallbackCtx = nullptr;
+
+    std::unique_ptr<JuceDaemonIODeviceCallback> daemonCallback = nullptr;
 };
 } // namespace milody::audio
 

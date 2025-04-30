@@ -14,13 +14,13 @@ enum class FileStatus {
     Directory,
 };
 
-MILODY_API FileStatus isFileExists(const std::string& path);
+MILODY_EDITOR_API FileStatus isFileExists(const std::string& path);
 
-MILODY_API std::vector<uint8_t> readFile(const std::string& path);
+MILODY_EDITOR_API std::vector<uint8_t> readFile(const std::string& path);
 
-MILODY_API void writeFile(const std::string& path, const std::vector<uint8_t>& data);
+MILODY_EDITOR_API void writeFile(const std::string& path, const std::vector<uint8_t>& data);
 
-MILODY_API void writeFile(const std::string& path, const uint8_t* data, size_t size);
+MILODY_EDITOR_API void writeFile(const std::string& path, const uint8_t* data, size_t size);
 } // namespace milody::io
 
 

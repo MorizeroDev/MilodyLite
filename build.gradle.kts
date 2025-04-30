@@ -1,5 +1,5 @@
 plugins {
-    id("party.para.h2cs") version "1.0.1" apply true
+    id("party.para.h2cs") version "1.0.2" apply true
 }
 
 group = "com.morizero.milody"
@@ -31,6 +31,7 @@ tasks {
             listOf("milody::audio::JuceAudioDeviceManager") to "IntPtr",
 
             listOf("milody::context::Context") to "IntPtr",
+            listOf("milody::game::model::BytesWrapper") to "IntPtr",
         )
     }
 }

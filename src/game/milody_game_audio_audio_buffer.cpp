@@ -1,4 +1,4 @@
-#include "Milody/audio/milody_juce_audio_format_reader.h"
+#include <Milody/audio/milody_juce_audio_format_reader.h>
 #include <Milody/audio/milody_juce_audio_device_manager.h>
 #include <Milody/game/milody_game_interface.h>
 #include <Milody/game/milody_game_retcode.h>
@@ -6,10 +6,10 @@
 
 using namespace milody::audio;
 int64_t MilodyAudioJuceAudioBufferCreate(JuceAudioBuffer*& buffer,
-                                         int32_t numChannel,
-                                         int32_t lengthPreChannel,
+                                         int32_t numChannelsToUse,
+                                         int32_t numSamples,
                                          int32_t mlock) {
-    buffer = new JuceAudioBuffer(numChannel, lengthPreChannel, mlock != 0);
+    buffer = new JuceAudioBuffer(numChannelsToUse, numSamples, mlock != 0);
     return MILODY_API_RET_OK;
 }
 

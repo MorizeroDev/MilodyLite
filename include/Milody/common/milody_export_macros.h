@@ -41,4 +41,11 @@
 #define MILODY_API
 #endif // defined(MILODY_DLL)
 
+#if defined(MILTHM_EDITOR)
+#define MILODY_EDITOR_API MILODY_API
+#else
+#define MILODY_EDITOR_API
+#endif
+
+
 #endif

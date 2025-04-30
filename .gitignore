@@ -114,3 +114,5 @@ out/
 /nbdist/
 /.nb-gradle/
 .vs
+
+CMakeLists.txt.user

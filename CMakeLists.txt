@@ -218,6 +218,7 @@ set(
         src/audio/milody_juce_sound_player.cpp
         src/audio/milody_juce_time_slice_thread.cpp
         src/audio/milody_juce_audio_format_manager.cpp
+        src/audio/milody_juce_daemon_iodevice_callback.cpp
         src/io/milody_io.cpp
         src/log/log.cpp
         src/log/log_unitylog.cpp
@@ -236,6 +237,7 @@ set(
         src/game/milody_game_audio_sound_player.cpp
         src/game/milody_game_plugin_main.cpp
         src/game/milody_game_context.cpp
+        src/game/milody_game_model.cpp
 )
 
 set(
@@ -288,7 +290,6 @@ if (DEFINED APPLE AND DEFINED IOS)
     find_library(UIKIT UIKit)
     set(PROJECT_PLATFORM_LIBRARIES ${PROJECT_PLATFORM_LIBRARIES} "${UIKIT}")
 endif ()
-
 
 # We will not use BUILD_SHARED_LIBS, and you can see the above comment for reasons.
 if (MILODY_BUILD_SHARED_LIBS)

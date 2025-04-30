@@ -5,6 +5,7 @@
 #include <juce_audio_devices/juce_audio_devices.h>
 #include <juce_audio_formats/juce_audio_formats.h>
 #include <unordered_set>
+#include <utility>
 
 namespace milody::audio {
 
@@ -37,7 +38,7 @@ inline std::vector<T> toVector(const juce::Array<T>& data) {
 
 class AudioIODeviceTypeInfo : public milody::util::serialization::serializable {
 public:
-    AudioIODeviceTypeInfo(juce::AudioIODeviceType* const pType);
+    explicit AudioIODeviceTypeInfo(juce::AudioIODeviceType* const pType);
 
     bool empty = false;
 
@@ -56,9 +57,36 @@ public:
     };
 };
 
+class AudioIODeviceTypeInfoList : public milody::util::serialization::serializable {
+private:
+    std::vector<AudioIODeviceTypeInfo> data;
+
+public:
+    explicit AudioIODeviceTypeInfoList(std::vector<AudioIODeviceTypeInfo> data)
+        : data(std::move(data)) {
+
+          };
+
+    AudioIODeviceTypeInfo* At(size_t position) {
+        return &data[position];
+    }
+
+    AudioIODeviceTypeInfo Get(size_t position) {
+        return data[position];
+    }
+
+    size_t Size() {
+        return data.size();
+    }
+
+    inline nlohmann::json toJson() override {
+        return vectorToJson(data);
+    };
+};
+
 class AudioIODeviceInfo : public milody::util::serialization::serializable {
 public:
-    AudioIODeviceInfo(juce::AudioIODevice* const p);
+    explicit AudioIODeviceInfo(juce::AudioIODevice* const p);
 
     bool empty = false;
 
@@ -80,6 +108,8 @@ public:
     juce::BigInteger activeInputChannels;
     int outputLatencyInSamples{};
     int inputLatencyInSamples{};
+    std::string lastError;
+    int xRunCount;
 
     inline nlohmann::json toJson() override {
         if (empty) {
@@ -104,6 +134,9 @@ public:
                 {"active_input_channels", std::string(activeInputChannels.toString(10).toRawUTF8())},
                 {"output_latency_in_samples", outputLatencyInSamples},
                 {"input_latency_in_samples", inputLatencyInSamples},
+
+                {"last_error", lastError},
+                {"x_run_count", xRunCount},
         };
 
         if (defaultOutputChannels.has_value()) {

@@ -1,6 +1,7 @@
 #include <Milody/audio/milody_juce_audio_device_manager.h>
 #include <Milody/audio/milody_juce_logger_proxy.h>
 #include <Milody/game/milody_game_interface.h>
+#include <Milody/game/milody_game_model.h>
 #include <Milody/game/milody_game_retcode.h>
 #include <Milody/util/milody_strutil.h>
 #include <juce_events/juce_events.h>
@@ -21,6 +22,7 @@ int64_t MilodyAudioJuceDeviceManagerCreate(JuceAudioDeviceManager*& mgr) try {
 }
 
 int64_t MilodyAudioJuceDeviceManagerDestroy(JuceAudioDeviceManager*& mgr) {
+    mgr->setChangeListenerCallback(nullptr, nullptr);
     delete mgr;
     mgr = nullptr;
     return MILODY_API_RET_OK;
@@ -38,23 +40,42 @@ int64_t MilodyAudioJuceDeviceManagerInitialize(JuceAudioDeviceManager* mgr) try 
 }
 
 int64_t MilodyAudioJuceDeviceManagerGetAvailableDeviceTypes(JuceAudioDeviceManager* mgr,
-                                                            uint8_t* buffer,
-                                                            uint64_t bufferSize,
-                                                            uint64_t& needed) {
+                                                            milody::game::model::BytesWrapper*& result) {
+    result = nullptr;
     auto devices = mgr->GetAvailableDeviceTypes();
-    auto result = vectorToJson(devices).dump();
-    needed = result.size();
-    return static_cast<int64_t>(milody::util::copyStringToBuffer(result, buffer, bufferSize));
+    auto json = vectorToJson(devices).dump();
+    result = new milody::game::model::BytesWrapper(std::move(json));
+    return MILODY_API_RET_OK;
 }
 
-int64_t MilodyAudioJuceDeviceManagerGetCurrentAudioDevice(JuceAudioDeviceManager* mgr,
-                                                          uint8_t* buffer,
-                                                          uint64_t bufferSize,
-                                                          uint64_t& needed) {
+int64_t MilodyAudioJuceDeviceManagerGetCurrentAudioDeviceInfo(JuceAudioDeviceManager* mgr,
+                                                              milody::game::model::BytesWrapper*& result) {
+    result = nullptr;
+    auto info = mgr->GetCurrentAudioDeviceInfo();
+    auto json = info.toJson().dump();
+    result = new milody::game::model::BytesWrapper(std::move(json));
+    return MILODY_API_RET_OK;
+}
+
+int64_t MilodyAudioJuceDeviceManagerGetCurrentAudioDeviceGetLastError(JuceAudioDeviceManager* mgr,
+                                                                      milody::game::model::BytesWrapper*& result) {
+    result = nullptr;
     auto info = mgr->GetCurrentAudioDevice();
-    auto result = info.toJson().dump();
-    needed = result.size();
-    return static_cast<int64_t>(milody::util::copyStringToBuffer(result, buffer, bufferSize));
+    if (info == nullptr) {
+        return MILODY_API_RET_FAILED;
+    }
+    auto lastError = info->getLastError();
+    result = new milody::game::model::BytesWrapper(lastError.toStdString());
+    return MILODY_API_RET_OK;
+}
+
+int64_t MilodyAudioJuceDeviceManagerGetCurrentAudioDeviceGetXRunCount(JuceAudioDeviceManager* mgr, int32_t& xRunCount) {
+    auto info = mgr->GetCurrentAudioDevice();
+    if (info == nullptr) {
+        return MILODY_API_RET_FAILED;
+    }
+    xRunCount = info->getXRunCount();
+    return MILODY_API_RET_OK;
 }
 
 int64_t MilodyAudioJuceDeviceManagerSetCurrentOutputDeviceType(JuceAudioDeviceManager* mgr, uint8_t* device) {
@@ -64,6 +85,14 @@ int64_t MilodyAudioJuceDeviceManagerSetCurrentOutputDeviceType(JuceAudioDeviceMa
 
 int64_t MilodyAudioJuceDeviceManagerSetCurrentOutputDeviceName(JuceAudioDeviceManager* mgr, uint8_t* devicNamee) {
     auto err = mgr->SetCurrentOutputDeviceName(reinterpret_cast<char*>(devicNamee));
+    if (err.isErr()) {
+        return MILODY_API_RET_AUDIO_FAILED;
+    }
+    return MILODY_API_RET_OK;
+}
+
+int64_t MilodyAudioJuceDeviceManagerSetCurrentBufferSize(JuceAudioDeviceManager* mgr, int32_t bufferSize) {
+    auto err = mgr->SetCurrentBufferSize(bufferSize);
     if (err.isErr()) {
         return MILODY_API_RET_AUDIO_FAILED;
     }
@@ -95,5 +124,27 @@ MilodyAudioJuceDeviceManagerSetChangeListenerCallback(JuceAudioDeviceManager* mg
                                                       MilodyJuceAudioDeviceManagerChangeListenerCallback callback,
                                                       void* ctx) {
     mgr->setChangeListenerCallback(callback, ctx);
+    return MILODY_API_RET_OK;
+}
+
+int64_t MilodyAudioJuceDeviceManagerEnableDaemonCallback(JuceAudioDeviceManager* mgr) {
+    mgr->EnableDaemonCallback();
+    return MILODY_API_RET_OK;
+}
+
+int64_t MilodyAudioJuceDeviceManagerDaemonCallbackGetCount(JuceAudioDeviceManager* mgr, int64_t& result) {
+    result = mgr->DaemonCallbackGetCount();
+    return MILODY_API_RET_OK;
+}
+
+int64_t MilodyAudioJuceDeviceManagerDaemonCallbackIsStopped(JuceAudioDeviceManager* mgr, int64_t& result) {
+    result = mgr->DaemonCallbackIsStopped() ? 1 : 0;
+    return MILODY_API_RET_OK;
+}
+
+int64_t MilodyAudioJuceDeviceManagerDaemonCallbackGetErrorMessage(JuceAudioDeviceManager* mgr,
+                                                                  milody::game::model::BytesWrapper*& output) {
+    auto result = mgr->DaemonCallbackGetErrorMessage();
+    output = new milody::game::model::BytesWrapper(result);
     return MILODY_API_RET_OK;
 }
